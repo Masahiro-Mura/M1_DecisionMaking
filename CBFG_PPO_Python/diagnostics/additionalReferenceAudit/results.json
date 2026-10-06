@@ -1,0 +1,71 @@
+{
+  "5": {
+    "training_steps": 150000,
+    "training_completed_episodes": 2742,
+    "training_successes": 1170,
+    "training_termination_reasons": {
+      "cbf_infeasible": 1540,
+      "road_departure": 3,
+      "success": 1170,
+      "collision": 29
+    },
+    "best": {
+      "episodes": 50,
+      "successful_episodes": 36,
+      "success_rate": 0.72,
+      "mean_reward": 148.0039776648477,
+      "mean_merge_point_successful": 297.9929038720899,
+      "termination_reasons": {
+        "success": 36,
+        "cbf_infeasible": 13,
+        "collision": 1
+      }
+    },
+    "final": {
+      "episodes": 50,
+      "successful_episodes": 34,
+      "success_rate": 0.68,
+      "mean_reward": 144.69046928634287,
+      "mean_merge_point_successful": 297.11596799800316,
+      "termination_reasons": {
+        "success": 34,
+        "cbf_infeasible": 15,
+        "collision": 1
+      }
+    }
+  },
+  "10": {
+    "training_steps": 150000,
+    "training_completed_episodes": 3521,
+    "training_successes": 1044,
+    "training_termination_reasons": {
+      "cbf_infeasible": 2454,
+      "success": 1044,
+      "road_departure": 4,
+      "collision": 19
+    },
+    "best": {
+      "episodes": 50,
+      "successful_episodes": 14,
+      "success_rate": 0.28,
+      "mean_reward": 86.75758935466376,
+      "mean_merge_point_successful": 308.6005889495414,
+      "termination_reasons": {
+        "success": 14,
+        "cbf_infeasible": 35,
+        "collision": 1
+      }
+    },
+    "final": {
+      "episodes": 50,
+      "successful_episodes": 11,
+      "success_rate": 0.22,
+      "mean_reward": 78.28431811617726,
+      "mean_merge_point_successful": 306.98127672730084,
+      "termination_reasons": {
+        "success": 11,
+        "cbf_infeasible": 39
+      }
+    }
+  }
+}

@@ -1,0 +1,58 @@
+{
+  "cbf\\roadCBF.py": {
+    "before": "031caf234d9ecd76ed7442e882c2fb147aef2f8d43a2fab8df971b448522e898",
+    "after": "1e9c7fe04c25d9485b86a53c57488e7418a6c564c7cc1154f7fcd857623c2fd6"
+  },
+  "cbf\\safeController.py": {
+    "before": "c940ce48d7831926a251dad3d44ce02bb96e37756d1caeaafa26f4bfe9a05e9c",
+    "after": "226ff5e02af1a80231c027f4a6c409b390acc46308313c9071ac4cc5a726eda0"
+  },
+  "environment\\actionAdapter.py": {
+    "before": "2b22978082c21356038df85ddc1c58078d1b9cc51b46dfd8a96d7e6e7a4f7ee5",
+    "after": "f2709d3587b57c34356a02bd70b22eb392eece9eb69325efb9dd987aa71dca69"
+  },
+  "environment\\mergeEnvironment.py": {
+    "before": "1ffc903cd6e02e4eec8d016a2d9ae30c6ce0fc5670ea102d062d759bf9cc0b05",
+    "after": "c2028702b33567530ac9df63a24c0eaad20d7de5f7708e55004d4d0f3f324853"
+  },
+  "environment\\termination.py": {
+    "before": "eb7d77cd389c9eff15f00a2c3037bf516fc3a0d820edb46a7a332f3ab9725ee6",
+    "after": "4659428f9de2ac1e997542fa4f247e074adf3fb24f54d7b6d5a06c947c9db667"
+  },
+  "main\\mainLearning.py": {
+    "before": "288f51a1ce4e27d1d4d8b76b0780bc077324fedb8ca020f6f6748cb1d08301b5",
+    "after": "91c0cec8d235244e5766fe60adba2bdee18bab764c548c2852bb6cdf45746e63"
+  },
+  "main\\mainSimulation.py": {
+    "before": "8c3742146f83fa59996d71c644040f4fb9aea2a3c4a2992eaa0c25a8400706d1",
+    "after": "e8974379b12bba327dc69c320f859a1b463a394de8d703c098ba6e1976a428df"
+  },
+  "mpc\\mpcCost.py": {
+    "before": "91be4b57eb40835d19db614e07edc3c4f35c90067d524e338e83c440e7629c27",
+    "after": "a7d4d08caf87ee4403b07181e2a881e9f801692abad761e2c97fecc750ab81e0"
+  },
+  "parameters\\environmentParameters.py": {
+    "before": "d1a34de3d434f593e8dd0c0e96ac30559369c59a813bd1c22cdc5000e562dbed",
+    "after": "cc1e2908014aedc4fdb20fb3b57c5e7af3f354e090bf9d8a1436f9fc132c1905"
+  },
+  "parameters\\rlParameters.py": {
+    "before": "e2541f364e7f6a317787c907684209701bc7ce8d9f0c6b4f643976e3fd22bd01",
+    "after": "a981bb7232d56af043aae6a2172d6fc3797e51cbdd6f949a2e950cfd3fc77b58"
+  },
+  "rl\\advantage.py": {
+    "before": "d075c433ab783f0098be8c3a76a7c592e2f0622b3c6f41a4eb3876c88887f5e2",
+    "after": "bd88a2cc66e8b62c708611a1998ec3ea7ad28be33afb39a6fc02d48b35d60a0a"
+  },
+  "rl\\cbfGuidedLoss.py": {
+    "before": "c39c921616031123ea8ac92e082c3c791b5d77a851618260471c5d9a1bff2cda",
+    "after": "76061e53444985070b9cfa278687ac4af623a554dc44da8a163af7d3634e7fc0"
+  },
+  "rl\\ppoAgent.py": {
+    "before": "6390922518807025694e2eaaf86f3d3cbd4672be4b68cb343de5d9b73f14d426",
+    "after": "ac4f0fda9a9ca47962b2a0fecb813936d654c8932bd12761846d557d46b44124"
+  },
+  "rl\\rolloutBuffer.py": {
+    "before": "d4480f3bbabcbaf1bd17d7993d83837204bdec12803f98f6d3d51c553c36105d",
+    "after": "1fbf17d59392adf13190555efeab35b27766ace36a9b98d50ab35790be9585a6"
+  }
+}

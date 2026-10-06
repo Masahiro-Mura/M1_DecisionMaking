@@ -1,0 +1,40 @@
+{
+  "trainingLog": {
+    "rows": 2130,
+    "completed_episodes": 2129,
+    "successes": 14,
+    "termination_reasons": {
+      "cbf_infeasible": 2089,
+      "success": 14,
+      "road_departure": 1,
+      "collision": 25,
+      "": 1
+    }
+  },
+  "evaluationLog": {
+    "rows": 50,
+    "completed_episodes": 50,
+    "successes": 3,
+    "termination_reasons": {
+      "cbf_infeasible": 46,
+      "collision": 1,
+      "success": 3
+    }
+  },
+  "bestPolicy": {
+    "training": {
+      "ego_initial_speed": 5.0,
+      "seed": 0,
+      "requested_timesteps": 150000,
+      "resume": null,
+      "global_step": 3072
+    },
+    "update_count": 1
+  },
+  "verification": {
+    "regression_tests_passed": 26,
+    "randomized_geometry_seeds": 20,
+    "new_full_training_performed": false,
+    "historical_results_overwritten": false
+  }
+}

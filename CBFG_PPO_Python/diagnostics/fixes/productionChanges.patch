@@ -1,0 +1,1037 @@
+--- before/cbf\roadCBF.py
++++ after/cbf\roadCBF.py
+@@ -44,6 +44,11 @@
+ 
+ The local lateral deviation at a predicted state is approximated using
+ the tangent of the lane at the previous vehicle position.
++
++IMPLEMENTATION ASSUMPTION: MergeEnvironment supplies a connected-road
++physical_barriers evaluator for the parallel merge/downstream geometry. In
++that mode h1/h2 measure the physical outer edges, not the current lane edges;
++both stay active across lane-ID changes. Local-only callers retain W/2 +/- d.
+ 
+ NOTE
+ ----
+@@ -58,6 +63,7 @@
+ from __future__ import annotations
+ 
+ from dataclasses import dataclass
++from typing import Callable
+ 
+ import numpy as np
+ 
+@@ -91,6 +97,11 @@
+     prior_lateral_deviation: float
+     lane_slope: float
+     lane_width: float = ROAD_LANE_WIDTH
++    # IMPLEMENTATION ASSUMPTION: optional connected-road envelope in the
++    # simulator coordinates. It prevents lane-center switches from redefining
++    # the safe set and constrains both physical outer edges independently of
++    # lane-change permission. The paper's printed local equations are ambiguous.
++    physical_barriers: Callable[[np.ndarray], tuple[float, float]] | None = None
+ 
+ 
+ def _validate_state(
+@@ -194,6 +205,8 @@
+         context,
+     )
+ 
++    if context.physical_barriers is not None:
++        return float(context.physical_barriers(_validate_state(ego_state))[0])
+     return float(
+         context.lane_width / 2.0
+         - lateral_deviation
+@@ -228,7 +241,9 @@
+         context,
+     )
+ 
++    if context.physical_barriers is not None:
++        return float(context.physical_barriers(_validate_state(ego_state))[1])
+     return float(
+         context.lane_width / 2.0
+         + lateral_deviation
+-    )+    )
+--- before/cbf\safeController.py
++++ after/cbf\safeController.py
+@@ -1,7 +1,7 @@
+ """
+ CBF-guided safety controller.
+ 
+-Main paper Eq. (25):
++Main paper Eq. (25) structure, with the Eq. (20) decay coefficient:
+ 
+     Delta_u = argmin ||Delta_u||
+ 
+@@ -23,12 +23,12 @@
+     Delta h >= -gamma_hat * h,
+ 
+ which algebraically corresponds to a factor (1 - gamma_hat), whereas
+-Eq. (25) explicitly prints (1 - gamma_hat). These two equations are not
++the supplied PDF Eq. (25) explicitly prints (1 + gamma_hat). These two equations are not
+ algebraically consistent.
+ 
+-This implementation intentionally follows Eq. (25) literally because the
+-goal of this first version is reproduction of the main paper. The discrepancy
+-is not silently corrected here.
++IMPLEMENTATION ASSUMPTION: use (1 - gamma_hat), consistent with Eq. (20)
++and the nonnegative invariant safe set, rather than the inconsistent printed
++factor in Eq. (25). The objective and constraint structure follow Eq. (25).
+ """
+ 
+ from __future__ import annotations
+@@ -138,6 +138,17 @@
+             for i in range(2)
+         ]
+ 
++        def minimum_value(correction):
++            values = [float(c['fun'](correction)) for c in constraints]
++            return min(values) if values and np.all(np.isfinite(values)) else (
++                float('inf') if not values else float('-inf'))
++
++        nominal_in_bounds = np.all(nominal_control >= CONTROL_LOWER_BOUND) and np.all(nominal_control <= CONTROL_UPPER_BOUND)
++        if nominal_in_bounds and minimum_value(np.zeros(2)) >= 0.:
++            return SafeControlResult(nominal_control.copy(), np.zeros(2), True,
++                                     False, 0., 'Nominal control is feasible.',
++                                     minimum_value(np.zeros(2)))
++
+         result = minimize(
+             fun=self._objective,
+             x0=np.zeros(2, dtype=np.float64),
+@@ -152,23 +163,39 @@
+         )
+ 
+         correction = np.asarray(result.x, dtype=np.float64)
++        if not np.all(np.isfinite(correction)):
++            correction = np.clip(np.zeros(2), *np.asarray(correction_bounds).T)
+         corrected_control = np.clip(
+             nominal_control + correction,
+             CONTROL_LOWER_BOUND,
+             CONTROL_UPPER_BOUND,
+         )
+         correction = corrected_control - nominal_control
+-
+-        constraint_values = [
+-            float(constraint["fun"](correction))
+-            for constraint in constraints
+-        ]
+-
+-        minimum_constraint_value = (
+-            min(constraint_values)
+-            if constraint_values
+-            else float("inf")
+-        )
++        message = str(result.message)
++
++        if minimum_value(correction) < -1e-6:
++            # IMPLEMENTATION ASSUMPTION: bounded feasibility recovery when
++            # SLSQP cannot find a feasible start. The final constraints are
++            # checked independently; no penalty slack relaxes the safe set.
++            feasible = []
++            for acceleration in (CONTROL_LOWER_BOUND[0], 0., CONTROL_UPPER_BOUND[0]):
++                for steering in np.linspace(CONTROL_LOWER_BOUND[1], CONTROL_UPPER_BOUND[1], 17):
++                    candidate = np.array([acceleration, steering]) - nominal_control
++                    if minimum_value(candidate) >= -1e-6:
++                        feasible.append(candidate)
++            if feasible:
++                start = min(feasible, key=self._objective)
++                recovered = minimize(self._objective, start, method=SOLVER_METHOD,
++                                     bounds=correction_bounds, constraints=constraints,
++                                     options={'maxiter': SOLVER_MAX_ITERATIONS, 'ftol': SOLVER_FTOL})
++                candidate = np.clip(np.asarray(recovered.x),
++                                    np.asarray(correction_bounds)[:, 0],
++                                    np.asarray(correction_bounds)[:, 1])
++                correction = candidate if minimum_value(candidate) >= -1e-6 and self._objective(candidate) <= self._objective(start) else start
++                corrected_control = nominal_control + correction
++                message += ' Feasible bounded recovery verified.'
++
++        minimum_constraint_value = minimum_value(correction)
+ 
+         intervention = bool(
+             np.linalg.norm(correction, ord=2)
+@@ -178,10 +205,11 @@
+         return SafeControlResult(
+             corrected_control=corrected_control,
+             correction=correction,
+-            success=bool(result.success and minimum_constraint_value >= -1e-6),
++            # Feasibility, not an optimizer status flag, decides deployment.
++            success=bool(np.all(np.isfinite(corrected_control)) and minimum_constraint_value >= -1e-6),
+             intervention=intervention,
+             objective_value=float(self._objective(correction)),
+-            message=str(result.message),
++            message=message,
+             minimum_constraint_value=float(minimum_constraint_value),
+         )
+ 
+@@ -247,7 +275,7 @@
+                     surrounding_state=next_sv,
+                 )
+ 
+-                # Main paper Eq. (25), reproduced literally.
++                # Eq. (20); see the printed Eq. (25) discrepancy above.
+                 return float(
+                     next_h
+                     - (1.0 - CBF_GAMMA) * current_h
+@@ -265,7 +293,11 @@
+         # The paper does not specify re-linearization inside one CBF solve;
+         # this is a local-road implementation assumption.
+         # ------------------------------------------------------------
+-        if left_change_feasible and road_context is not None:
++        physical_edges = road_context is not None and road_context.physical_barriers is not None
++        # IMPLEMENTATION ASSUMPTION: at a shrinking road corridor, a negative
++        # current look-ahead barrier must not permit an outside next state.
++        # Demand h_next >= 0 in addition to the Eq. (20) decay constraint.
++        if (left_change_feasible or physical_edges) and road_context is not None:
+             current_h1 = left_road_barrier(ego_state, road_context)
+ 
+             def left_constraint(correction, current_h=current_h1):
+@@ -277,14 +309,15 @@
+ 
+                 return float(
+                     next_h
+-                    - (1.0 - CBF_GAMMA) * current_h
++                    - (max(0., (1.0 - CBF_GAMMA) * current_h) if physical_edges
++                       else (1.0 - CBF_GAMMA) * current_h)
+                 )
+ 
+             constraints.append(
+                 {"type": "ineq", "fun": left_constraint}
+             )
+ 
+-        if right_change_feasible and road_context is not None:
++        if (right_change_feasible or physical_edges) and road_context is not None:
+             current_h2 = right_road_barrier(ego_state, road_context)
+ 
+             def right_constraint(correction, current_h=current_h2):
+@@ -296,7 +329,8 @@
+ 
+                 return float(
+                     next_h
+-                    - (1.0 - CBF_GAMMA) * current_h
++                    - (max(0., (1.0 - CBF_GAMMA) * current_h) if physical_edges
++                       else (1.0 - CBF_GAMMA) * current_h)
+                 )
+ 
+             constraints.append(
+--- before/environment\actionAdapter.py
++++ after/environment\actionAdapter.py
+@@ -85,3 +85,14 @@
+         velocity=velocity,
+         heading=heading,
+     )
++
++
++def reference_to_action(velocity: float, heading: float) -> np.ndarray:
++    """Inverse of the existing physical reference mapping, with bounds."""
++    action = np.array([
++        _linear_map(velocity, REFERENCE_SPEED_MIN, REFERENCE_SPEED_MAX,
++                    ACTION_NORMALIZED_MIN, ACTION_NORMALIZED_MAX),
++        _linear_map(heading, REFERENCE_HEADING_MIN, REFERENCE_HEADING_MAX,
++                    ACTION_NORMALIZED_MIN, ACTION_NORMALIZED_MAX),
++    ])
++    return np.clip(action, ACTION_NORMALIZED_MIN, ACTION_NORMALIZED_MAX).astype(np.float32)
+--- before/environment\mergeEnvironment.py
++++ after/environment\mergeEnvironment.py
+@@ -33,7 +33,7 @@
+     lateral_deviation,
+ )
+ from environment.reward import compute_reward
+-from environment.termination import evaluate_termination
++from environment.termination import evaluate_termination, check_merge_completed, TerminationResult
+ from mpc.mpcController import MPCController
+ from parameters.cbfParameters import INTERVENTION_THRESHOLD
+ from parameters.environmentParameters import (
+@@ -118,6 +118,7 @@
+         self.surrounding_vehicles = []
+ 
+         self.step_count: int = 0
++        self._stable_main_lane_steps = 0
+         self._previous_reference_heading: float | None = None
+         self._previous_ego_position: np.ndarray | None = None
+         self._previous_lateral_deviation: float = 0.0
+@@ -145,6 +146,7 @@
+         self.vehicle.color = VehicleGraphics.EGO_COLOR
+ 
+         self.step_count = 0
++        self._stable_main_lane_steps = 0
+         self._previous_reference_heading = None
+         self._previous_ego_position = np.asarray(
+             self.vehicle.position,
+@@ -216,15 +218,18 @@
+         # ------------------------------------------------------------
+         # 5) Apply safe control and advance HighwayEnv dynamics.
+         # ------------------------------------------------------------
+-        self.vehicle.act(
+-            {
+-                "acceleration": float(safe_result.corrected_control[0]),
+-                "steering": float(safe_result.corrected_control[1]),
+-            }
+-        )
+-
+-        self.road.step(SIMULATION_DT)
++        control_applied = bool(mpc_result.success and safe_result.success)
++        if control_applied:
++            self.vehicle.act(
++                {
++                    "acceleration": float(safe_result.corrected_control[0]),
++                    "steering": float(safe_result.corrected_control[1]),
++                }
++            )
++            self.road.step(SIMULATION_DT)
+         self.step_count += 1
++        self._stable_main_lane_steps = (self._stable_main_lane_steps + 1
++            if control_applied and check_merge_completed(self.road, self.vehicle) else 0)
+ 
+         # ------------------------------------------------------------
+         # 6) Termination.
+@@ -234,7 +239,14 @@
+             ego_vehicle=self.vehicle,
+             step_count=self.step_count,
+             ego_initial_speed=self.ego_initial_speed,
+-        )
++            stable_main_lane_steps=self._stable_main_lane_steps,
++        ) if control_applied else TerminationResult(
++            # IMPLEMENTATION ASSUMPTION: infeasible/failed solver output is
++            # rejected without advancing the world; an absorbing failure is
++            # returned instead of claiming a safe control was deployed.
++            terminated=True, truncated=False, success=False, collision=False,
++            road_departure=False, time_limit=False, control_failure=True,
++            reason='cbf_infeasible' if mpc_result.success else 'mpc_failed')
+ 
+         # ------------------------------------------------------------
+         # 7) Reward, exactly decomposed into Eq. (2)-(7).
+@@ -285,10 +297,19 @@
+             "mpc_control": mpc_result.control.copy(),
+             "mpc_success": mpc_result.success,
+             "safe_control": safe_result.corrected_control.copy(),
++            # safe_control remains the legacy candidate field. A rejected
++            # candidate is never an applied control or a valid BC teacher.
++            "applied_control": safe_result.corrected_control.copy() if control_applied else None,
+             "cbf_correction": safe_result.correction.copy(),
+             "cbf_correction_norm": correction_norm,
+             "cbf_intervention": cbf_intervention,
+             "cbf_solver_success": safe_result.success,
++            "control_applied": control_applied,
++            "control_failure": termination.control_failure,
++            "cbf_minimum_constraint": safe_result.minimum_constraint_value,
++            "cbf_solver_message": safe_result.message,
++            "ego_state_before": ego_state.copy(),
++            "stable_main_lane_steps": self._stable_main_lane_steps,
+             "reward_lane_center": reward_breakdown.lane_center,
+             "reward_merge": reward_breakdown.merge,
+             "reward_steering": reward_breakdown.steering,
+@@ -352,28 +373,66 @@
+         """
+         Build the local Eq. (23)-(24) road context.
+ 
+-        The paper specifies a prior coordinate and prior lateral deviation but
+-        not the exact extraction algorithm from HighwayEnv. v1 uses the ego
+-        center/deviation saved at the preceding environment step and the
+-        tangent slope of the current closest lane.
++        IMPLEMENTATION ASSUMPTION: relinearize position, deviation and tangent
++        together in the current lane frame; do not mix prior/current lane IDs.
++        For the physical road constraints, join touching drivable lane intervals
++        in that tangent frame, including the forbidden-but-drivable ramp. Both
++        outer edges remain constrained even when lcf/rcf change at a lane switch.
+         """
+         lane = self.road.network.get_lane(self.vehicle.lane_index)
+-        longitudinal, _ = lane.local_coordinates(self.vehicle.position)
++        longitudinal, deviation = lane.local_coordinates(self.vehicle.position)
+         lane_heading = float(lane.heading_at(longitudinal))
+ 
+-        prior = (
+-            self._previous_ego_position
+-            if self._previous_ego_position is not None
+-            else np.asarray(self.vehicle.position, dtype=np.float64)
+-        )
++        prior = np.asarray(self.vehicle.position, dtype=np.float64).copy()
++        normal = np.array([-np.sin(lane_heading), np.cos(lane_heading)])
++        lanes = tuple(self.road.network.lanes_list())
++
++        def connected_bounds(position):
++            intervals = []
++            for candidate in lanes:
++                distance, _ = candidate.local_coordinates(position)
++                if -1e-8 <= distance <= candidate.length + 1e-8:
++                    center = candidate.position(distance, 0.)
++                    offset = float((center - prior) @ normal)
++                    half_width = float(candidate.width_at(distance)) / 2.
++                    intervals.append((offset - half_width, offset + half_width))
++            if not intervals:
++                return 1., -1.
++            connected = []
++            for lower, upper in sorted(intervals):
++                if connected and lower <= connected[-1][1] + 1e-8:
++                    connected[-1] = (connected[-1][0], max(upper, connected[-1][1]))
++                else:
++                    connected.append((lower, upper))
++            # The connected component nearest the fixed current ego anchor
++            # stays selected within this solve; gaps are never declared road.
++            lower, upper = min(connected, key=lambda bounds: max(bounds[0], -bounds[1], 0.))
++            return lower, upper
++
++        # IMPLEMENTATION ASSUMPTION: on this forward highway, the largest
++        # reachable x displacement in one Euler step is v*dt. Use the corridor
++        # intersection over that step so the disappearing ramp does not cause
++        # an artificial CBF jump for an ego already driving on the main road.
++        future = prior + np.array([max(0., self.vehicle.speed) * SIMULATION_DT, 0.])
++        lower_now, upper_now = connected_bounds(prior)
++        lower_future, upper_future = connected_bounds(future)
++        corridor_lower = max(lower_now, lower_future)
++        corridor_upper = min(upper_now, upper_future)
++
++        def physical_barriers(state):
++            lower_actual, upper_actual = connected_bounds(state[:2])
++            lower = max(corridor_lower, lower_actual)
++            upper = min(corridor_upper, upper_actual)
++            lateral = float((state[:2] - prior) @ normal)
++            return upper - lateral, lateral - lower
+ 
+         return RoadCBFContext(
+             prior_x=float(prior[0]),
+             prior_y=float(prior[1]),
+-            prior_lateral_deviation=float(
+-                self._previous_lateral_deviation
+-            ),
++            prior_lateral_deviation=float(deviation),
+             lane_slope=float(np.tan(lane_heading)),
++            lane_width=float(lane.width_at(longitudinal)),
++            physical_barriers=physical_barriers,
+         )
+ 
+     def _front_rear_distances(
+--- before/environment\termination.py
++++ after/environment\termination.py
+@@ -38,6 +38,9 @@
+     MAX_STEPS_BY_MIN_SPEED,
+     SUCCESS_MAX_LATERAL_DEVIATION,
+     SUCCESS_MIN_X,
++    SUCCESS_STABILITY_DURATION,
++    SUCCESS_TARGET_X,
++    SIMULATION_DT,
+     TERMINATE_ON_COLLISION,
+     TERMINATE_ON_ROAD_DEPARTURE,
+     TERMINATE_ON_SUCCESSFUL_MERGE,
+@@ -53,10 +56,11 @@
+     road_departure: bool
+     time_limit: bool
+     reason: str | None
++    control_failure: bool = False
+ 
+     @property
+     def failure(self) -> bool:
+-        return bool(self.collision or self.road_departure or self.time_limit)
++        return bool(self.collision or self.road_departure or self.time_limit or self.control_failure)
+ 
+ 
+ def check_collision(ego_vehicle: Vehicle) -> bool:
+@@ -108,7 +112,7 @@
+     return float(lateral)
+ 
+ 
+-def check_success(
++def check_merge_completed(
+     road: Road,
+     ego_vehicle: Vehicle,
+ ) -> bool:
+@@ -149,6 +153,17 @@
+     return bool(
+         abs(lateral_deviation) <= SUCCESS_MAX_LATERAL_DEVIATION
+     )
++
++
++def check_success(road: Road, ego_vehicle: Vehicle, stable_main_lane_steps: int = 0) -> bool:
++    """IV-A/B: completed merge, sustained main-lane driving, target reached.
++
++    IMPLEMENTATION ASSUMPTION: numerical duration/target/tolerance live in
++    environmentParameters; the main paper does not give these thresholds.
++    """
++    return bool(check_merge_completed(road, ego_vehicle)
++                and stable_main_lane_steps * SIMULATION_DT >= SUCCESS_STABILITY_DURATION
++                and float(ego_vehicle.position[0]) >= SUCCESS_TARGET_X)
+ 
+ 
+ def check_time_limit(
+@@ -172,6 +187,7 @@
+     ego_vehicle: Vehicle,
+     step_count: int,
+     ego_initial_speed: float,
++    stable_main_lane_steps: int = 0,
+ ) -> TerminationResult:
+     """Evaluate all episode-ending conditions."""
+     collision = (
+@@ -187,7 +203,7 @@
+     )
+ 
+     success = (
+-        check_success(road, ego_vehicle)
++        check_success(road, ego_vehicle, stable_main_lane_steps)
+         if TERMINATE_ON_SUCCESSFUL_MERGE
+         else False
+     )
+--- before/main\mainLearning.py
++++ after/main\mainLearning.py
+@@ -46,6 +46,8 @@
+     CHECKPOINT_INTERVAL_STEPS,
+     SUCCESS_SMOOTHING_WINDOW,
+     TOTAL_TIMESTEPS,
++    BEST_POLICY_EVALUATION_EPISODES,
++    BEST_POLICY_EVALUATION_SEED,
+ )
+ from rl.ppoAgent import PPOAgent, UpdateMetrics
+ 
+@@ -216,6 +218,50 @@
+         writer.writerow(row)
+ 
+ 
++def evaluate_policy(agent: PPOAgent, ego_initial_speed: float, seed: int) -> tuple[float, float]:
++    """Fixed held-out deterministic episodes; never use the training env.
++
++    IMPLEMENTATION ASSUMPTION: rank by success fraction, then average return.
++    Neither stochastic training scores nor unupdated networks are candidates.
++    """
++    env = MergeEnvironment(ego_initial_speed=ego_initial_speed)
++    successes, returns = [], []
++    try:
++        for episode in range(BEST_POLICY_EVALUATION_EPISODES):
++            observation, _ = env.reset(seed=BEST_POLICY_EVALUATION_SEED + seed + episode)
++            total_reward = 0.
++            while True:
++                action = agent.select_action(observation, deterministic=True).action
++                observation, reward, terminated, truncated, info = env.step(action)
++                total_reward += reward
++                if terminated or truncated:
++                    successes.append(float(info['success']))
++                    returns.append(total_reward)
++                    break
++    finally:
++        env.close()
++    return float(np.mean(successes)), float(np.mean(returns))
++
++
++def select_best_policy(agent: PPOAgent, speed: float, seed: int,
++                       best_score: tuple[float, float], global_step: int) -> tuple[float, float]:
++    if agent.update_count <= 0:
++        return best_score
++    score = evaluate_policy(agent, speed, seed)
++    selected = score >= best_score
++    # Ties select the latest update, including the final partial rollout.
++    if selected:
++        agent.save(MODELS_DIR / 'bestPolicy.pt')
++    path = LOGS_DIR / 'policySelectionLog.csv'
++    with path.open('a', newline='', encoding='utf-8') as stream:
++        writer = csv.writer(stream)
++        if stream.tell() == 0:
++            writer.writerow(['update', 'global_step', 'deterministic_success_rate',
++                             'mean_return', 'selected_best'])
++        writer.writerow([agent.update_count, global_step, *score, int(selected)])
++    return score if selected else best_score
++
++
+ def train(
+     ego_initial_speed: float,
+     total_timesteps: int,
+@@ -223,6 +269,8 @@
+     resume: str | None,
+ ) -> None:
+     """Run CBFG-PPO training."""
++    if total_timesteps <= 0:
++        raise ValueError('total_timesteps must be positive')
+     ensure_result_directories()
+ 
+     env = MergeEnvironment(
+@@ -231,13 +279,20 @@
+     agent = PPOAgent(seed=seed)
+ 
+     if resume is not None:
+-        agent.load(resume, load_optimizer=True)
++        agent.load(resume, load_optimizer=True, require_compatible=True)
++        if agent.training_metadata.get('ego_initial_speed', ego_initial_speed) != ego_initial_speed:
++            raise ValueError('Resume checkpoint was trained for a different initial-speed scenario.')
++    agent.training_metadata = {'ego_initial_speed': ego_initial_speed,
++                               'seed': seed, 'requested_timesteps': total_timesteps,
++                               'resume': resume}
+ 
+     episode_rows: list[dict] = []
+     recent_success = deque(maxlen=SUCCESS_SMOOTHING_WINDOW)
+ 
+-    best_success_rate = -1.0
+-    best_episode_reward = -np.inf
++    best_score = (-1., -np.inf)
++    # Each training invocation has its own optimization/selection logs.
++    for filename in ('updateLog.csv', 'policySelectionLog.csv'):
++        (LOGS_DIR / filename).write_text('', encoding='utf-8')
+ 
+     global_step = 0
+     episode_index = 0
+@@ -294,6 +349,7 @@
+                 # True terminal states stop value bootstrap.
+                 # Time-limit truncation is intentionally not passed as terminal.
+                 terminated=terminated,
++                truncated=truncated,
+                 env_info=info,
+             )
+ 
+@@ -306,6 +362,7 @@
+                 info.get("cbf_intervention", False)
+             )
+             global_step += 1
++            agent.training_metadata['global_step'] = global_step
+ 
+             if agent.buffer.full:
+                 latest_metrics = agent.update()
+@@ -315,6 +372,8 @@
+                     global_step,
+                     latest_metrics,
+                 )
++                best_score = select_best_policy(agent, ego_initial_speed, seed,
++                                                best_score, global_step)
+ 
+             if global_step >= next_checkpoint:
+                 agent.save(
+@@ -360,22 +419,6 @@
+         }
+         episode_rows.append(row)
+ 
+-        # Best-policy criterion:
+-        # highest recent success rate; episode return breaks ties.
+-        if (
+-            rolling_success_rate > best_success_rate
+-            or (
+-                np.isclose(
+-                    rolling_success_rate,
+-                    best_success_rate,
+-                )
+-                and episode_reward > best_episode_reward
+-            )
+-        ):
+-            best_success_rate = rolling_success_rate
+-            best_episode_reward = episode_reward
+-            agent.save(MODELS_DIR / "bestPolicy.pt")
+-
+         write_episode_log(episode_rows)
+ 
+         print(
+@@ -398,6 +441,8 @@
+             global_step,
+             latest_metrics,
+         )
++        best_score = select_best_policy(agent, ego_initial_speed, seed,
++                                        best_score, global_step)
+ 
+     agent.save(MODELS_DIR / "finalPolicy.pt")
+ 
+--- before/main\mainSimulation.py
++++ after/main\mainSimulation.py
+@@ -120,6 +120,8 @@
+         "reference_heading",
+         "acceleration",
+         "steering",
++        "control_applied",
++        "control_failure",
+         "cbf_delta_acceleration",
+         "cbf_delta_steering",
+         "cbf_intervention",
+@@ -293,18 +295,21 @@
+         [row["road_departure"] for row in rows]
+     )
+     time_limit_rate = np.mean([row["time_limit"] for row in rows])
++    control_failure_rate = np.mean([row.get('control_failure', 0) for row in rows])
+ 
+     labels = [
+         "Success",
+         "Collision",
+         "Road departure",
+         "Time limit",
++        "Control failure",
+     ]
+     values = [
+         success_rate,
+         collision_rate,
+         road_departure_rate,
+         time_limit_rate,
++        control_failure_rate,
+     ]
+ 
+     fig, ax = plt.subplots(figsize=(7, 5))
+@@ -397,8 +402,10 @@
+                 "reference_heading": float(
+                     info["reference_heading"]
+                 ),
+-                "acceleration": float(info["safe_control"][0]),
+-                "steering": float(info["safe_control"][1]),
++                "acceleration": float(info['applied_control'][0]) if info['control_applied'] else np.nan,
++                "steering": float(info['applied_control'][1]) if info['control_applied'] else np.nan,
++                "control_applied": int(info['control_applied']),
++                "control_failure": int(info['control_failure']),
+                 "cbf_delta_acceleration": float(
+                     info["cbf_correction"][0]
+                 ),
+@@ -454,6 +461,7 @@
+             info.get("road_departure", False)
+         ),
+         "time_limit": int(info.get("time_limit", False)),
++        "control_failure": int(info.get('control_failure', False)),
+         "termination_reason": info.get(
+             "termination_reason",
+             "",
+@@ -530,7 +538,9 @@
+         render_mode="rgb_array",
+     )
+     agent = PPOAgent()
+-    agent.load(model_path, load_optimizer=False)
++    agent.load(model_path, load_optimizer=False, require_trained=True, require_compatible=True)
++    if agent.training_metadata.get('ego_initial_speed', ego_initial_speed) != ego_initial_speed:
++        raise ValueError('Policy was trained for a different initial-speed scenario.')
+ 
+     evaluation_rows: list[dict] = []
+ 
+--- before/mpc\mpcCost.py
++++ after/mpc\mpcCost.py
+@@ -90,13 +90,8 @@
+ 
+     Implementation detail
+     ---------------------
+-    For N controls, the rollout contains N+1 states. We apply the tracking
+-    term to all N+1 predicted states and the input penalty to the N available
+-    controls.
+-
+-    The paper writes both sums compactly from k=0...n_p and does not resolve
+-    this terminal-index convention. Including the terminal tracking cost is a
+-    standard and minimal interpretation of Eq. (17).
++    Eq. (17) sums k=0,...,n_p-1. For N controls the rollout contains N+1
++    states; only x_0,...,x_(N-1) enter the cost. No extra terminal penalty.
+     """
+     states = np.asarray(predicted_states, dtype=np.float64)
+     controls = np.asarray(control_sequence, dtype=np.float64)
+@@ -115,7 +110,7 @@
+ 
+     cost = 0.0
+ 
+-    for state in states:
++    for state in states[:-1]:
+         error = reference - output_from_state(state)
+         cost += quadratic_form(error, q_matrix)
+ 
+--- before/parameters\environmentParameters.py
++++ after/parameters\environmentParameters.py
+@@ -251,6 +251,14 @@
+ # selected main-lane center prevents premature success during lane crossing.
+ SUCCESS_MAX_LATERAL_DEVIATION: float = 1.0
+ 
++# IMPLEMENTATION ASSUMPTION: IV-A requires no further failure for a specified
++# time, and IV-B describes a designated target, without numerical definitions.
++# Require 2 s continuously centered on a main lane after merging, and reach a
++# downstream target 10 m before the finite simulated road ends. Configurable
++# reproduction choices, not values reported by the paper.
++SUCCESS_STABILITY_DURATION: float = 2.0  # [s]
++SUCCESS_TARGET_X: float = ROAD_MAIN_LENGTH - 10.0  # [m]
++
+ # ============================================================
+ # Evaluation / video settings
+ # ============================================================
+--- before/parameters\rlParameters.py
++++ after/parameters\rlParameters.py
+@@ -101,3 +101,8 @@
+ # The main paper does not report checkpoint frequency.
+ CHECKPOINT_INTERVAL_STEPS: int = 30_000
+ 
++# IMPLEMENTATION ASSUMPTION: checkpoint selection is not specified by the
++# paper. Compare each updated policy deterministically on these fixed held-out
++# scenarios, instead of stochastic training-episode scores.
++BEST_POLICY_EVALUATION_EPISODES: int = 10
++BEST_POLICY_EVALUATION_SEED: int = 1_000_000
+--- before/rl\advantage.py
++++ after/rl\advantage.py
+@@ -26,17 +26,21 @@
+     terminated: np.ndarray,
+     gamma: float = DISCOUNT_FACTOR_GAMMA,
+     gae_lambda: float = GAE_LAMBDA,
++    episode_ends: np.ndarray | None = None,
+ ) -> tuple[np.ndarray, np.ndarray]:
+     """
+     Compute GAE advantages and bootstrapped returns.
+ 
+     terminated=1 blocks bootstrap. Gymnasium truncation is deliberately not
+     treated as a terminal state, so a time-limit transition may bootstrap.
++    episode_ends blocks the GAE recursion at BOTH termination and truncation.
+     """
+     rewards = np.asarray(rewards, dtype=np.float64)
+     values = np.asarray(values, dtype=np.float64)
+     next_values = np.asarray(next_values, dtype=np.float64)
+     terminated = np.asarray(terminated, dtype=np.float64)
++    episode_ends = (terminated.copy() if episode_ends is None
++                    else np.asarray(episode_ends, dtype=np.float64))
+ 
+     n = rewards.shape[0]
+ 
+@@ -44,6 +48,7 @@
+         values.shape == (n,)
+         and next_values.shape == (n,)
+         and terminated.shape == (n,)
++        and episode_ends.shape == (n,)
+     ):
+         raise ValueError("All GAE arrays must have shape (N,)")
+ 
+@@ -61,7 +66,7 @@
+ 
+         gae = (
+             delta
+-            + gamma * gae_lambda * nonterminal * gae
++            + gamma * gae_lambda * (1.0 - max(episode_ends[t], terminated[t])) * gae
+         )
+         advantages[t] = gae
+ 
+--- before/rl\cbfGuidedLoss.py
++++ after/rl\cbfGuidedLoss.py
+@@ -16,18 +16,12 @@
+ corrects the MPC low-level input [acceleration, steering]. Nevertheless,
+ Eq. (27)/(31) compares a CBF-corrected behavior directly with pi_theta(.|s).
+ 
+-The paper does not specify the mapping from low-level CBF correction back into
+-the actor's normalized action space. To keep the first implementation
+-executable, this module uses an explicit implementation assumption:
+-
+-    normalized_demo =
+-        clip(policy_action + normalized_low_level_correction, -1, 1)
+-
+-where each low-level correction component is scaled by its corresponding
+-physical control range.
+-
+-This bridge should be treated as a reproduction uncertainty and can later be
+-replaced without changing PPO internals.
++IMPLEMENTATION ASSUMPTION: The paper does not specify the inverse mapping
++from corrected acceleration/steering to a reference action. For interventions
++we use the speed/heading reached by one model step with the feasible corrected
++control, then invert actionAdapter. This is a dimensionally consistent local
++behavior teacher, NOT an exact inverse of the horizon MPC or a safety proof
++for future references. CBF filtering remains active at every subsequent step.
+ """
+ 
+ from __future__ import annotations
+@@ -35,10 +29,8 @@
+ import numpy as np
+ import torch
+ 
+-from parameters.mpcParameters import (
+-    CONTROL_LOWER_BOUND,
+-    CONTROL_UPPER_BOUND,
+-)
++from environment.actionAdapter import reference_to_action
++from mpc.kinematicBicycleModel import discrete_step
+ 
+ 
+ def correction_amplitude(
+@@ -80,9 +72,11 @@
+ def build_demonstration_action(
+     policy_action: np.ndarray,
+     cbf_correction: np.ndarray,
++    ego_state: np.ndarray | None = None,
++    nominal_control: np.ndarray | None = None,
+ ) -> np.ndarray:
+     """
+-    Construct an actor-space demonstration under the documented v1 assumption.
++    Construct a model-realized reference teacher for a feasible intervention.
+ 
+     policy_action:
+         normalized [v_ref, theta_ref] in [-1,1]^2
+@@ -98,15 +92,9 @@
+             "policy_action and cbf_correction must both have shape (2,)"
+         )
+ 
+-    control_span = (
+-        np.asarray(CONTROL_UPPER_BOUND, dtype=np.float64)
+-        - np.asarray(CONTROL_LOWER_BOUND, dtype=np.float64)
+-    )
+-
+-    normalized_correction = 2.0 * correction / control_span
+-
+-    return np.clip(
+-        policy_action + normalized_correction,
+-        -1.0,
+-        1.0,
+-    ).astype(np.float32)
++    if np.linalg.norm(correction) <= 1e-8:
++        return np.clip(policy_action, -1., 1.).astype(np.float32)
++    if ego_state is None or nominal_control is None:
++        raise ValueError('A nonzero CBF teacher requires physical ego_state and nominal_control.')
++    safe_state = discrete_step(ego_state, np.asarray(nominal_control) + correction)
++    return reference_to_action(float(safe_state[2]), float(safe_state[3]))
+--- before/rl\ppoAgent.py
++++ after/rl\ppoAgent.py
+@@ -16,6 +16,7 @@
+ 
+ from dataclasses import dataclass
+ from pathlib import Path
++import hashlib
+ 
+ import numpy as np
+ import torch
+@@ -96,6 +97,8 @@
+         )
+ 
+         self.buffer = RolloutBuffer()
++        self.update_count = 0
++        self.training_metadata: dict = {}
+ 
+     @torch.no_grad()
+     def select_action(
+@@ -135,6 +138,7 @@
+         next_state: np.ndarray,
+         terminated: bool,
+         env_info: dict,
++        truncated: bool = False,
+     ) -> None:
+         """
+         Store one Algorithm-1 transition.
+@@ -152,10 +156,13 @@
+             env_info.get("cbf_intervention", False)
+         )
+ 
++        actor_valid = bool(env_info.get('control_applied', True))
+         demonstration_action = build_demonstration_action(
+             policy_action=action_result.action,
+             cbf_correction=cbf_correction,
+-        )
++            ego_state=env_info.get('ego_state_before'),
++            nominal_control=env_info.get('mpc_control'),
++        ) if actor_valid and intervention else action_result.action.copy()
+ 
+         self.buffer.add(
+             state=state,
+@@ -168,6 +175,8 @@
+             cbf_correction=cbf_correction,
+             cbf_intervention=intervention,
+             demonstration_action=demonstration_action,
++            truncated=truncated,
++            actor_valid=actor_valid,
+         )
+ 
+     @torch.no_grad()
+@@ -189,6 +198,7 @@
+                 self.buffer.terminated,
+                 dtype=np.float32,
+             ),
++            episode_ends=np.asarray(self.buffer.episode_ends, dtype=np.float32),
+         )
+ 
+         self.buffer.set_advantages_and_returns(
+@@ -240,6 +250,8 @@
+             "entropy": 0.0,
+         }
+         update_count = 0
++        actor_valid = torch.as_tensor(self.buffer.actor_valid, dtype=torch.bool,
++                                      device=self.device)
+ 
+         for _ in range(NUM_OPTIMIZATION_EPOCHS):
+             for indices_np in RolloutBuffer.minibatch_indices(
+@@ -259,6 +271,7 @@
+                 advantages = batch.advantages[indices]
+                 corrections = batch.cbf_corrections[indices]
+                 intervention_mask = batch.cbf_interventions[indices]
++                valid = actor_valid[indices]
+                 demo_actions = batch.demonstration_actions[indices]
+ 
+                 new_log_probs, entropy_values = (
+@@ -268,7 +281,10 @@
+                 # ----------------------------------------------------
+                 # Actor Eq. (31): disjoint PPO and intervention sets.
+                 # ----------------------------------------------------
+-                non_intervention_mask = ~intervention_mask
++                non_intervention_mask = ~intervention_mask & valid
++                # IMPLEMENTATION ASSUMPTION: rejected solver outputs are not
++                # demonstrations of applied safe behavior; exclude actor loss.
++                intervention_mask = intervention_mask & valid
+ 
+                 zero_actor = self.actor.forward(states).sum() * 0.0
+ 
+@@ -354,6 +370,7 @@
+         )
+ 
+         self.buffer.clear()
++        self.update_count += 1
+ 
+         denominator = max(update_count, 1)
+ 
+@@ -377,6 +394,18 @@
+                 "actor": self.actor.state_dict(),
+                 "critic": self.critic.state_dict(),
+                 "optimizer": self.optimizer.state_dict(),
++                "metadata": {
++                    "schema_version": 2,
++                    "update_count": self.update_count,
++                    "implementation": "cbfg-ppo-corrected-v2",
++                    "training": self.training_metadata.copy(),
++                    "source_sha256": {
++                        str(source.relative_to(Path(__file__).resolve().parents[1])):
++                        hashlib.sha256(source.read_bytes()).hexdigest()
++                        for folder in ('rl', 'mpc', 'cbf', 'environment', 'parameters', 'scenario', 'surrounding_vehicle_model')
++                        for source in (Path(__file__).resolve().parents[1] / folder).glob('*.py')
++                    },
++                },
+             },
+             path,
+         )
+@@ -385,6 +414,8 @@
+         self,
+         path: str | Path,
+         load_optimizer: bool = True,
++        require_trained: bool = False,
++        require_compatible: bool = False,
+     ) -> None:
+         """Load a saved checkpoint."""
+         checkpoint = torch.load(
+@@ -392,8 +423,25 @@
+             map_location=self.device,
+         )
+ 
++        metadata = checkpoint.get('metadata', {})
++        trained = bool(metadata.get('update_count', 0) or checkpoint.get('optimizer', {}).get('state', {}))
++        if require_trained and not trained:
++            raise ValueError('Checkpoint has no training updates. Train a new policy or select a trained checkpoint.')
++        if require_compatible:
++            root = Path(__file__).resolve().parents[1]
++            hashes = metadata.get('source_sha256', {})
++            if metadata.get('implementation') != 'cbfg-ppo-corrected-v2' or not hashes or any(
++                not (root / name).is_file() or hashlib.sha256((root / name).read_bytes()).hexdigest() != value
++                for name, value in hashes.items()
++            ):
++                raise ValueError('Checkpoint environment/algorithm metadata is incompatible. Start fresh training; legacy checkpoints remain available for diagnostics.')
++
+         self.actor.load_state_dict(checkpoint["actor"])
+         self.critic.load_state_dict(checkpoint["critic"])
++        self.training_metadata = metadata.get('training', {}).copy()
++        self.update_count = int(checkpoint.get('metadata', {}).get('update_count', 0))
++        if not self.update_count:
++            self.update_count = int(bool(checkpoint.get('optimizer', {}).get('state', {})))
+ 
+         if load_optimizer and "optimizer" in checkpoint:
+             self.optimizer.load_state_dict(
+--- before/rl\rolloutBuffer.py
++++ after/rl\rolloutBuffer.py
+@@ -53,6 +53,8 @@
+         self.rewards: list[float] = []
+         self.next_states: list[np.ndarray] = []
+         self.terminated: list[bool] = []
++        self.episode_ends: list[bool] = []
++        self.actor_valid: list[bool] = []
+         self.old_log_probs: list[float] = []
+         self.values: list[float] = []
+         self.cbf_corrections: list[np.ndarray] = []
+@@ -81,6 +83,8 @@
+         cbf_correction: np.ndarray,
+         cbf_intervention: bool,
+         demonstration_action: np.ndarray,
++        truncated: bool = False,
++        actor_valid: bool = True,
+     ) -> None:
+         """Append one transition."""
+         if self.full:
+@@ -95,6 +99,8 @@
+             np.asarray(next_state, dtype=np.float32).copy()
+         )
+         self.terminated.append(bool(terminated))
++        self.episode_ends.append(bool(terminated or truncated))
++        self.actor_valid.append(bool(actor_valid))
+         self.old_log_probs.append(float(old_log_prob))
+         self.values.append(float(value))
+         self.cbf_corrections.append(

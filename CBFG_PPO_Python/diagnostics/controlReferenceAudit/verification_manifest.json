@@ -1,0 +1,48 @@
+{
+  "tests_passed": 66,
+  "new_training_performed": false,
+  "policy_provenance": "historical v4 best policies; exact audited diagnostic source update only; default strict guard unchanged",
+  "sources": [
+    {
+      "reference": 34,
+      "path": "C:\\Users\\mura\\Downloads\\2011.08484v3 (1).pdf",
+      "sha256": "8e6f562488b6fc847285d5b148620f623321eb095e7f3a9ccf2a30964614a555"
+    },
+    {
+      "reference": 38,
+      "path": "C:\\Users\\mura\\Downloads\\2105.10596v2 (1).pdf",
+      "sha256": "ca29ca91b93b7ce042d6f4b3ca2bd4e87c03a80f0cdd3f05d7470132447588aa"
+    },
+    {
+      "reference": 39,
+      "path": "C:\\Users\\mura\\Downloads\\2007.11718v3 (1).pdf",
+      "sha256": "5b8789704c0a9faebac33a139840a5b43629bcc46219ee3598a83bbef9d6654c"
+    }
+  ],
+  "evaluations": [
+    {
+      "speed": 5,
+      "episodes": 50,
+      "successes": 36,
+      "cbf_candidate_failures": 13,
+      "collisions": 1,
+      "original_episode_csv_identical": true,
+      "original_trace_fields_identical": true,
+      "trace_steps": 92,
+      "trace_corrections": 0,
+      "finite_barrier_diagnostics": true
+    },
+    {
+      "speed": 10,
+      "episodes": 50,
+      "successes": 14,
+      "cbf_candidate_failures": 35,
+      "collisions": 1,
+      "original_episode_csv_identical": true,
+      "original_trace_fields_identical": true,
+      "trace_steps": 74,
+      "trace_corrections": 0,
+      "finite_barrier_diagnostics": true
+    }
+  ]
+}

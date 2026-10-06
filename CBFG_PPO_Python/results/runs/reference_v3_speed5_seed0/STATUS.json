@@ -1,0 +1,6 @@
+{
+  "status": "interrupted_diagnostic_only",
+  "reason": "Main-paper maintained minimum-speed condition was missing; restarted as v4",
+  "last_reported_step": 89016,
+  "use_for_paper_reproduction": false
+}

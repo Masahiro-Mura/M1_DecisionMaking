@@ -1,0 +1,145 @@
+[
+  {
+    "speed": 5.0,
+    "theta_ref": 0.0,
+    "steering": 0.0,
+    "passed": true
+  },
+  {
+    "speed": 5.0,
+    "theta_ref": 0.1,
+    "steering": 0.23322149975057083,
+    "passed": true
+  },
+  {
+    "speed": 5.0,
+    "theta_ref": -0.1,
+    "steering": -0.23322150681643014,
+    "passed": true
+  },
+  {
+    "speed": 5.0,
+    "theta_ref": 0.0,
+    "saturated_warm_start_steering": -0.00013440272769961985,
+    "passed": true
+  },
+  {
+    "speed": 5.0,
+    "ego_heading": -0.2,
+    "theta_ref": -0.2,
+    "steering": 0.0,
+    "passed": true
+  },
+  {
+    "speed": 5.0,
+    "ego_heading": -0.2,
+    "theta_ref": -0.1,
+    "steering": 0.2332214995910342,
+    "passed": true
+  },
+  {
+    "speed": 5.0,
+    "ego_heading": -0.2,
+    "theta_ref": -0.30000000000000004,
+    "steering": -0.2332215078092902,
+    "passed": true
+  },
+  {
+    "speed": 5.0,
+    "ego_heading": 0.2,
+    "theta_ref": 0.2,
+    "steering": 0.0,
+    "passed": true
+  },
+  {
+    "speed": 5.0,
+    "ego_heading": 0.2,
+    "theta_ref": 0.30000000000000004,
+    "steering": 0.2332215004550066,
+    "passed": true
+  },
+  {
+    "speed": 5.0,
+    "ego_heading": 0.2,
+    "theta_ref": 0.1,
+    "steering": -0.23322150697607782,
+    "passed": true
+  },
+  {
+    "speed": 10.0,
+    "theta_ref": 0.0,
+    "steering": 0.0,
+    "passed": true
+  },
+  {
+    "speed": 10.0,
+    "theta_ref": 0.1,
+    "steering": 0.17430923077880367,
+    "passed": true
+  },
+  {
+    "speed": 10.0,
+    "theta_ref": -0.1,
+    "steering": -0.1743092415864379,
+    "passed": true
+  },
+  {
+    "speed": 10.0,
+    "theta_ref": 0.0,
+    "saturated_warm_start_steering": -0.00012002184785590424,
+    "passed": true
+  },
+  {
+    "speed": 10.0,
+    "ego_heading": -0.2,
+    "theta_ref": -0.2,
+    "steering": 0.0,
+    "passed": true
+  },
+  {
+    "speed": 10.0,
+    "ego_heading": -0.2,
+    "theta_ref": -0.1,
+    "steering": 0.17430922987634317,
+    "passed": true
+  },
+  {
+    "speed": 10.0,
+    "ego_heading": -0.2,
+    "theta_ref": -0.30000000000000004,
+    "steering": -0.17430924225650482,
+    "passed": true
+  },
+  {
+    "speed": 10.0,
+    "ego_heading": 0.2,
+    "theta_ref": 0.2,
+    "steering": 0.0,
+    "passed": true
+  },
+  {
+    "speed": 10.0,
+    "ego_heading": 0.2,
+    "theta_ref": 0.30000000000000004,
+    "steering": 0.174309229552282,
+    "passed": true
+  },
+  {
+    "speed": 10.0,
+    "ego_heading": 0.2,
+    "theta_ref": 0.1,
+    "steering": -0.17430924166801057,
+    "passed": true
+  },
+  {
+    "safe_cbf_correction": [
+      0.0,
+      0.0
+    ],
+    "unsafe_cbf_correction": [
+      -1.490073856613567e-08,
+      -0.29799999596148347
+    ],
+    "passed": true
+  }
+]

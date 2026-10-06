@@ -1,0 +1,11 @@
+----------------------------------------------------------------------
+Ran 66 tests in 2.671s
+
+OK
+[Episode    0] step=      8 reward=  10.725 success=0 success_rate=nan cbf=0.625
+
+Training complete.
+Final model : C:\Users\mura\Simulation\Research activities\M1_DecisionMaking\CBFG_PPO_Python\diagnostics\tmpzgo13om4\models\finalPolicy.pt
+Best model  : C:\Users\mura\Simulation\Research activities\M1_DecisionMaking\CBFG_PPO_Python\diagnostics\tmpzgo13om4\models\bestPolicy.pt
+Logs        : C:\Users\mura\Simulation\Research activities\M1_DecisionMaking\CBFG_PPO_Python\diagnostics\tmpzgo13om4\logs
+Figures     : C:\Users\mura\Simulation\Research activities\M1_DecisionMaking\CBFG_PPO_Python\diagnostics\tmpzgo13om4\figures

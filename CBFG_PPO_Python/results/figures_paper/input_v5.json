@@ -1,0 +1,14 @@
+[
+  {
+    "method": "CBFG-PPO",
+    "speed": 5,
+    "seed": 0,
+    "directory": "../runs/training_v5_speed5_seed0"
+  },
+  {
+    "method": "CBFG-PPO",
+    "speed": 10,
+    "seed": 0,
+    "directory": "../runs/training_v5_speed10_seed0"
+  }
+]

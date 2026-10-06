@@ -1,0 +1,69 @@
+IMAGEIO FFMPEG_WRITER WARNING: input image is not divisible by macro_block_size=16, resizing from (1000, 400) to (1008, 400) to ensure video compatibility with most codecs and players. To prevent resizing, make your input image divisible by the macro_block_size or set the macro_block_size to 1 (risking incompatibility).
+[Evaluation   1/50] duration= 18.4s main_lane=1 merge_x=273.5112183531314 success=1 reason=success
+[Evaluation   2/50] duration= 17.4s main_lane=1 merge_x=270.1740399708892 success=1 reason=success
+[Evaluation   3/50] duration= 18.6s main_lane=1 merge_x=302.78418460210156 success=1 reason=success
+[Evaluation   4/50] duration= 18.2s main_lane=1 merge_x=295.4757037438877 success=1 reason=success
+[Evaluation   5/50] duration= 12.2s main_lane=1 merge_x=285.2839642711413 success=0 reason=cbf_infeasible
+[Evaluation   6/50] duration= 18.6s main_lane=1 merge_x=303.19963808706575 success=1 reason=success
+[Evaluation   7/50] duration= 17.4s main_lane=1 merge_x=283.7515433740189 success=1 reason=success
+[Evaluation   8/50] duration= 18.4s main_lane=1 merge_x=292.3580125294711 success=1 reason=success
+[Evaluation   9/50] duration=  0.2s main_lane=0 merge_x=nan success=0 reason=cbf_infeasible
+[Evaluation  10/50] duration=  8.8s main_lane=1 merge_x=274.3139542582556 success=0 reason=cbf_infeasible
+[Evaluation  11/50] duration= 18.4s main_lane=1 merge_x=313.2337149724477 success=1 reason=success
+[Evaluation  12/50] duration=  7.2s main_lane=0 merge_x=nan success=0 reason=cbf_infeasible
+[Evaluation  13/50] duration= 18.0s main_lane=1 merge_x=297.8730284513607 success=1 reason=success
+[Evaluation  14/50] duration= 18.0s main_lane=1 merge_x=307.6244187095597 success=1 reason=success
+[Evaluation  15/50] duration= 18.0s main_lane=1 merge_x=283.4142626862518 success=1 reason=success
+[Evaluation  16/50] duration=  9.2s main_lane=1 merge_x=289.6722882283384 success=0 reason=cbf_infeasible
+[Evaluation  17/50] duration= 18.0s main_lane=1 merge_x=289.4953503251428 success=1 reason=success
+[Evaluation  18/50] duration= 13.0s main_lane=1 merge_x=310.01163345708716 success=0 reason=cbf_infeasible
+[Evaluation  19/50] duration= 18.2s main_lane=1 merge_x=310.2307320787623 success=1 reason=success
+[Evaluation  20/50] duration=  1.2s main_lane=0 merge_x=nan success=0 reason=cbf_infeasible
+[Evaluation  21/50] duration= 17.6s main_lane=1 merge_x=305.5148161496929 success=1 reason=success
+[Evaluation  22/50] duration= 17.8s main_lane=1 merge_x=298.945708858896 success=1 reason=success
+[Evaluation  23/50] duration= 18.8s main_lane=1 merge_x=284.91343761460047 success=1 reason=success
+[Evaluation  24/50] duration= 17.8s main_lane=1 merge_x=310.51672945638796 success=1 reason=success
+[Evaluation  25/50] duration= 18.2s main_lane=1 merge_x=311.52615645583523 success=1 reason=success
+[Evaluation  26/50] duration= 17.8s main_lane=1 merge_x=299.6476998819414 success=1 reason=success
+[Evaluation  27/50] duration= 12.4s main_lane=1 merge_x=302.3375709171583 success=0 reason=cbf_infeasible
+[Evaluation  28/50] duration= 18.6s main_lane=1 merge_x=282.10128795477704 success=1 reason=success
+[Evaluation  29/50] duration=  0.2s main_lane=0 merge_x=nan success=0 reason=cbf_infeasible
+[Evaluation  30/50] duration= 18.4s main_lane=1 merge_x=282.0299770231671 success=1 reason=success
+[Evaluation  31/50] duration= 18.2s main_lane=1 merge_x=310.74021944834544 success=1 reason=success
+[Evaluation  32/50] duration=  0.2s main_lane=0 merge_x=nan success=0 reason=cbf_infeasible
+[Evaluation  33/50] duration= 17.8s main_lane=1 merge_x=293.95227444335626 success=1 reason=success
+[Evaluation  34/50] duration= 17.2s main_lane=1 merge_x=305.308960252713 success=1 reason=success
+[Evaluation  35/50] duration= 18.8s main_lane=1 merge_x=291.53660060383254 success=1 reason=success
+[Evaluation  36/50] duration= 18.4s main_lane=1 merge_x=294.5474303982825 success=1 reason=success
+[Evaluation  37/50] duration=  7.2s main_lane=0 merge_x=nan success=0 reason=cbf_infeasible
+[Evaluation  38/50] duration= 18.0s main_lane=1 merge_x=312.13016769228614 success=1 reason=success
+[Evaluation  39/50] duration= 18.2s main_lane=1 merge_x=294.3189683763683 success=1 reason=success
+[Evaluation  40/50] duration= 18.2s main_lane=1 merge_x=274.98737578340297 success=1 reason=success
+[Evaluation  41/50] duration= 18.6s main_lane=1 merge_x=311.07876457297016 success=1 reason=success
+[Evaluation  42/50] duration= 18.6s main_lane=1 merge_x=311.72918278492034 success=1 reason=success
+[Evaluation  43/50] duration=  5.6s main_lane=0 merge_x=nan success=0 reason=collision
+[Evaluation  44/50] duration= 18.4s main_lane=1 merge_x=311.3766600926784 success=1 reason=success
+[Evaluation  45/50] duration= 17.2s main_lane=1 merge_x=297.3963209278097 success=1 reason=success
+[Evaluation  46/50] duration= 18.2s main_lane=1 merge_x=310.02226709422126 success=1 reason=success
+[Evaluation  47/50] duration= 18.0s main_lane=1 merge_x=298.5009907672637 success=1 reason=success
+[Evaluation  48/50] duration=  0.2s main_lane=0 merge_x=nan success=0 reason=cbf_infeasible
+[Evaluation  49/50] duration=  7.6s main_lane=0 merge_x=nan success=0 reason=cbf_infeasible
+[Evaluation  50/50] duration= 18.2s main_lane=1 merge_x=311.7966948774 success=1 reason=success
+
+Visualization episode: 1/50, seed=10000
+
+Evaluation complete.
+Success rate       : 0.720
+Main-lane entry rate: 0.820
+Mean merge point   : 297.993 m
+
+Selected simulation diagnostics:
+Duration           : 18.4 s
+Main lane entered  : True
+Main-lane entry t  : 4.0
+Merge point x      : 273.5112183531314
+Success            : True
+
+Video   : C:\Users\mura\Simulation\Research activities\M1_DecisionMaking\CBFG_PPO_Python\results\runs\control_reference_diagnostics_speed5_seed0\videos\simulation.mp4
+Logs    : C:\Users\mura\Simulation\Research activities\M1_DecisionMaking\CBFG_PPO_Python\results\runs\control_reference_diagnostics_speed5_seed0\logs
+Figures : C:\Users\mura\Simulation\Research activities\M1_DecisionMaking\CBFG_PPO_Python\results\runs\control_reference_diagnostics_speed5_seed0\figures

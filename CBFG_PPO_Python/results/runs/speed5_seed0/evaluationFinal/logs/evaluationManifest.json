@@ -1,0 +1,16 @@
+{
+  "model": "C:\\Users\\mura\\Simulation\\Research activities\\M1_DecisionMaking\\CBFG_PPO_Python\\results\\runs\\speed5_seed0\\models\\finalPolicy.pt",
+  "ego_initial_speed": 5.0,
+  "episodes": 50,
+  "seed": 10000,
+  "test_speed_jitter": 1.0,
+  "test_speed_jitter_source": "Implementation assumption: amplitude unreported in IV-B",
+  "trained_policy_metadata": {
+    "ego_initial_speed": 5.0,
+    "seed": 0,
+    "requested_timesteps": 150000,
+    "resume": null,
+    "global_step": 150000
+  },
+  "deterministic_action": "tanh of Gaussian mean (bounded policy convention)"
+}

@@ -1,0 +1,279 @@
+{
+  "seed": 10000,
+  "speed": 5.0,
+  "model": "C:\\Users\\mura\\Simulation\\Research activities\\M1_DecisionMaking\\CBFG_PPO_Python\\results\\models\\finalPolicy.pt",
+  "model_sha256": "3ec3539cfac25a2eb68cd619b2c15e946d6d6493fe5601237fba42c2ee242d2b",
+  "checkpoint_environment_version": "not recorded; compatibility cannot be certified",
+  "production_sha256": {
+    "rl\\actor.py": "8e616e98922d29d79af95ef696aab0a9875dc139094ec03fa6e408d6632fdb56",
+    "rl\\advantage.py": "bd88a2cc66e8b62c708611a1998ec3ea7ad28be33afb39a6fc02d48b35d60a0a",
+    "rl\\cbfGuidedLoss.py": "76061e53444985070b9cfa278687ac4af623a554dc44da8a163af7d3634e7fc0",
+    "rl\\critic.py": "dc1648c20d09203056103a369c558e591127a845dbf8ce752e6eb6b774543c91",
+    "rl\\ppoAgent.py": "ac4f0fda9a9ca47962b2a0fecb813936d654c8932bd12761846d557d46b44124",
+    "rl\\ppoLoss.py": "a38975ad12e12de0ad613b58740dc588e51b208e1810bc9cb76578dd01b77a6c",
+    "rl\\rolloutBuffer.py": "1fbf17d59392adf13190555efeab35b27766ace36a9b98d50ab35790be9585a6",
+    "mpc\\kinematicBicycleModel.py": "872feb148a2fa91244d03f03431ca887eb243ca1218da1233dab55334bbc8e2a",
+    "mpc\\mpcController.py": "cec8888d182b09d8b31b71f7a172b18c66f1c87705819bf3c758a558c5118fc7",
+    "mpc\\mpcCost.py": "a7d4d08caf87ee4403b07181e2a881e9f801692abad761e2c97fecc750ab81e0",
+    "cbf\\ellipseGeometry.py": "5e613d04d904eef7674dfa83bd385f735431b40c08d811cb92ef0fa9886739fc",
+    "cbf\\roadCBF.py": "1e9c7fe04c25d9485b86a53c57488e7418a6c564c7cc1154f7fcd857623c2fd6",
+    "cbf\\safeController.py": "226ff5e02af1a80231c027f4a6c409b390acc46308313c9071ac4cc5a726eda0",
+    "cbf\\vehicleCBF.py": "9cb43197a37e1a75a2e631b5c6fb319183372906240a65f4976b95e9a8e81cb9",
+    "environment\\actionAdapter.py": "f2709d3587b57c34356a02bd70b22eb392eece9eb69325efb9dd987aa71dca69",
+    "environment\\mergeEnvironment.py": "c2028702b33567530ac9df63a24c0eaad20d7de5f7708e55004d4d0f3f324853",
+    "environment\\observation.py": "5606c606b549d5ebe5b556beb7e475e1bcbce090ed4b836c70b931e8db8df2e2",
+    "environment\\reward.py": "e344a7fbc7a0218b14fe7fe456a0d16ea74aa9792520bf007f8b8507cac5ddfc",
+    "environment\\termination.py": "4659428f9de2ac1e997542fa4f247e074adf3fb24f54d7b6d5a06c947c9db667",
+    "parameters\\cbfParameters.py": "eb395464329bbd1fbf9ba357388e7ab7bb25bfb97ae0448b4cbec06ab994b0f7",
+    "parameters\\environmentParameters.py": "cc1e2908014aedc4fdb20fb3b57c5e7af3f354e090bf9d8a1436f9fc132c1905",
+    "parameters\\idmParameters.py": "b915f56e5cfef2936337ef1070d51f9880b06e91bf8a1346d143551aa6c749c1",
+    "parameters\\mpcParameters.py": "7901297a37dd360235ddcbbbe4bea0d68606ebb3e07516c44d9ee686a53cf09a",
+    "parameters\\rlParameters.py": "a981bb7232d56af043aae6a2172d6fc3797e51cbdd6f949a2e950cfd3fc77b58",
+    "parameters\\vehicleParameters.py": "1e41de9c4befe9b9f21cb4f1a819616b3ffb34443fbffcbeb3f7de8ae8125238",
+    "scenario\\mergeRoad.py": "fe210cfaeaa3f1f5174ef634419a8ba4a3745c155056d366ba192c546f6b5173",
+    "scenario\\mergeScenario.py": "2608c5e71e0ba435815c20ac7e96ef338ec19038a2bd80cf9748b00c84d28626",
+    "surrounding_vehicle_model\\idmModel.py": "b94bae2bab4e0876164f6383003455eecc85479f16cca41f94302632455e6c2a",
+    "surrounding_vehicle_model\\surroundingVehicle.py": "92dc0c68f151a87e699d309a6d6df12110b62d23ef5fb59df5fe62cda0ab4fda"
+  },
+  "isolated_checks": [
+    {
+      "speed": 5.0,
+      "theta_ref": 0.0,
+      "steering": 0.0,
+      "passed": true
+    },
+    {
+      "speed": 5.0,
+      "theta_ref": 0.1,
+      "steering": 0.23319682369176659,
+      "passed": true
+    },
+    {
+      "speed": 5.0,
+      "theta_ref": -0.1,
+      "steering": -0.23319684401790244,
+      "passed": true
+    },
+    {
+      "speed": 5.0,
+      "theta_ref": 0.0,
+      "saturated_warm_start_steering": -0.00026753964540681324,
+      "passed": true
+    },
+    {
+      "speed": 5.0,
+      "ego_heading": -0.2,
+      "theta_ref": -0.2,
+      "steering": 0.0,
+      "passed": true
+    },
+    {
+      "speed": 5.0,
+      "ego_heading": -0.2,
+      "theta_ref": -0.1,
+      "steering": 0.23319684459262102,
+      "passed": true
+    },
+    {
+      "speed": 5.0,
+      "ego_heading": -0.2,
+      "theta_ref": -0.30000000000000004,
+      "steering": -0.2331968652013213,
+      "passed": true
+    },
+    {
+      "speed": 5.0,
+      "ego_heading": 0.2,
+      "theta_ref": 0.2,
+      "steering": 0.0,
+      "passed": true
+    },
+    {
+      "speed": 5.0,
+      "ego_heading": 0.2,
+      "theta_ref": 0.30000000000000004,
+      "steering": 0.2331968463213607,
+      "passed": true
+    },
+    {
+      "speed": 5.0,
+      "ego_heading": 0.2,
+      "theta_ref": 0.1,
+      "steering": -0.23319682876438055,
+      "passed": true
+    },
+    {
+      "speed": 10.0,
+      "theta_ref": 0.0,
+      "steering": 0.0,
+      "passed": true
+    },
+    {
+      "speed": 10.0,
+      "theta_ref": 0.1,
+      "steering": 0.17433769230289292,
+      "passed": true
+    },
+    {
+      "speed": 10.0,
+      "theta_ref": -0.1,
+      "steering": -0.17433770446728283,
+      "passed": true
+    },
+    {
+      "speed": 10.0,
+      "theta_ref": 0.0,
+      "saturated_warm_start_steering": -0.00013195113548264601,
+      "passed": true
+    },
+    {
+      "speed": 10.0,
+      "ego_heading": -0.2,
+      "theta_ref": -0.2,
+      "steering": 0.0,
+      "passed": true
+    },
+    {
+      "speed": 10.0,
+      "ego_heading": -0.2,
+      "theta_ref": -0.1,
+      "steering": 0.17433769256186854,
+      "passed": true
+    },
+    {
+      "speed": 10.0,
+      "ego_heading": -0.2,
+      "theta_ref": -0.30000000000000004,
+      "steering": -0.1743377049522569,
+      "passed": true
+    },
+    {
+      "speed": 10.0,
+      "ego_heading": 0.2,
+      "theta_ref": 0.2,
+      "steering": 0.0,
+      "passed": true
+    },
+    {
+      "speed": 10.0,
+      "ego_heading": 0.2,
+      "theta_ref": 0.30000000000000004,
+      "steering": 0.17433769260962564,
+      "passed": true
+    },
+    {
+      "speed": 10.0,
+      "ego_heading": 0.2,
+      "theta_ref": 0.1,
+      "steering": -0.1743377047503469,
+      "passed": true
+    },
+    {
+      "safe_cbf_correction": [
+        0.0,
+        0.0
+      ],
+      "unsafe_cbf_correction": [
+        -1.490073856613567e-08,
+        -0.29799999596148347
+      ],
+      "passed": true
+    }
+  ],
+  "cases": [
+    {
+      "case": "A",
+      "steps": 113,
+      "saturation_fraction": 0.0,
+      "mpc_failures": 0,
+      "cbf_failures": 1,
+      "rejected_controls": 1,
+      "unsafe_controls_applied": 0,
+      "interventions": 1,
+      "theta_ref_range": [
+        -0.20286476940049702,
+        0.23411227825323677
+      ],
+      "steering_range": [
+        -0.55066835137776,
+        0.6387999494644035
+      ],
+      "nominal_safe_steps": 111,
+      "max_correction_when_nominal_safe": 0.0,
+      "final_x": 459.31318574316697,
+      "final_y": 1.6372768922075767,
+      "termination_reason": "cbf_infeasible",
+      "max_warm_cold_steering_difference": 0.0011282775920366805,
+      "cold_failures": 0
+    },
+    {
+      "case": "B",
+      "steps": 7,
+      "saturation_fraction": 0.0,
+      "mpc_failures": 0,
+      "cbf_failures": 1,
+      "rejected_controls": 1,
+      "unsafe_controls_applied": 0,
+      "interventions": 2,
+      "theta_ref_range": [
+        0.0,
+        0.0
+      ],
+      "steering_range": [
+        0.0,
+        0.19803312332474654
+      ],
+      "nominal_safe_steps": 5,
+      "max_correction_when_nominal_safe": 0.0,
+      "final_x": 235.9770420978259,
+      "final_y": 7.786953669179731,
+      "termination_reason": "cbf_infeasible"
+    },
+    {
+      "case": "C",
+      "steps": 8,
+      "saturation_fraction": 0.0,
+      "mpc_failures": 0,
+      "cbf_failures": 1,
+      "rejected_controls": 1,
+      "unsafe_controls_applied": 0,
+      "interventions": 2,
+      "theta_ref_range": [
+        0.09999999999999998,
+        0.09999999999999998
+      ],
+      "steering_range": [
+        0.005761788838312592,
+        0.23319691501681586
+      ],
+      "nominal_safe_steps": 6,
+      "max_correction_when_nominal_safe": 0.0,
+      "final_x": 236.9587860275708,
+      "final_y": 8.513493103541583,
+      "termination_reason": "cbf_infeasible"
+    },
+    {
+      "case": "D",
+      "steps": 6,
+      "saturation_fraction": 0.0,
+      "mpc_failures": 0,
+      "cbf_failures": 1,
+      "rejected_controls": 1,
+      "unsafe_controls_applied": 0,
+      "interventions": 1,
+      "theta_ref_range": [
+        -0.09999999999999998,
+        -0.09999999999999998
+      ],
+      "steering_range": [
+        -0.23319689885509365,
+        -0.009973635486314603
+      ],
+      "nominal_safe_steps": 5,
+      "max_correction_when_nominal_safe": 0.0,
+      "final_x": 234.97126603907262,
+      "final_y": 7.465226326075483,
+      "termination_reason": "cbf_infeasible"
+    }
+  ]
+}

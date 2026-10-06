@@ -1,0 +1,14 @@
+[
+  {
+    "method": "CBFG-PPO",
+    "speed": 5,
+    "seed": 0,
+    "directory": "C:\\Users\\mura\\Simulation\\Research activities\\M1_DecisionMaking\\CBFG_PPO_Python\\results\\runs\\reference_v4_speed5_seed0"
+  },
+  {
+    "method": "CBFG-PPO",
+    "speed": 10,
+    "seed": 0,
+    "directory": "C:\\Users\\mura\\Simulation\\Research activities\\M1_DecisionMaking\\CBFG_PPO_Python\\results\\runs\\reference_v4_speed10_seed0"
+  }
+]

@@ -1,0 +1,31 @@
+----------------------------------------------------------------------
+Ran 77 tests in 4.418s
+
+OK
+[Episode    0] step=      2 reward=   2.000 success=0 success_rate=0.000 cbf=0.000
+[Episode    1] step=      4 reward=   2.000 success=0 success_rate=0.000 cbf=0.000
+[Episode    2] step=      6 reward=   2.000 success=0 success_rate=0.000 cbf=0.000
+[Episode    3] step=      7 reward=   1.000 success=0 success_rate=0.000 cbf=0.000
+
+Training complete.
+Final model : C:\Users\mura\AppData\Local\Temp\tmpij0_zrdt\models\finalPolicy.pt
+Best model  : C:\Users\mura\AppData\Local\Temp\tmpij0_zrdt\models\bestPolicy.pt
+Logs        : C:\Users\mura\AppData\Local\Temp\tmpij0_zrdt\logs
+Figures     : C:\Users\mura\AppData\Local\Temp\tmpij0_zrdt\figures
+[Episode    0] step=      2 reward=   2.000 success=1 success_rate=1.000 cbf=0.000
+[Episode    1] step=      4 reward=   2.000 success=1 success_rate=1.000 cbf=0.000
+[Episode    2] step=      6 reward=   2.000 success=1 success_rate=1.000 cbf=0.000
+[Episode    3] step=      7 reward=   1.000 success=0 success_rate=1.000 cbf=0.000
+
+Training complete.
+Final model : C:\Users\mura\Simulation\Research activities\M1_DecisionMaking\CBFG_PPO_Python\diagnostics\tmpwk3fohxg\models\finalPolicy.pt
+Best model  : C:\Users\mura\Simulation\Research activities\M1_DecisionMaking\CBFG_PPO_Python\diagnostics\tmpwk3fohxg\models\bestPolicy.pt
+Logs        : C:\Users\mura\Simulation\Research activities\M1_DecisionMaking\CBFG_PPO_Python\diagnostics\tmpwk3fohxg\logs
+Figures     : C:\Users\mura\Simulation\Research activities\M1_DecisionMaking\CBFG_PPO_Python\diagnostics\tmpwk3fohxg\figures
+[Episode    0] step=     38 reward=  53.614 success=0 success_rate=0.000 cbf=0.684
+
+Training complete.
+Final model : C:\Users\mura\Simulation\Research activities\M1_DecisionMaking\CBFG_PPO_Python\diagnostics\tmpjqljzrh7\models\finalPolicy.pt
+Best model  : C:\Users\mura\Simulation\Research activities\M1_DecisionMaking\CBFG_PPO_Python\diagnostics\tmpjqljzrh7\models\bestPolicy.pt
+Logs        : C:\Users\mura\Simulation\Research activities\M1_DecisionMaking\CBFG_PPO_Python\diagnostics\tmpjqljzrh7\logs
+Figures     : C:\Users\mura\Simulation\Research activities\M1_DecisionMaking\CBFG_PPO_Python\diagnostics\tmpjqljzrh7\figures

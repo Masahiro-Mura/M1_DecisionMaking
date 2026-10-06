@@ -1,0 +1,130 @@
+{
+  "5": {
+    "training": {
+      "global_steps": 150000,
+      "rows": 2282,
+      "completed_episodes": 2281,
+      "successful_episodes": 1172,
+      "last_3000_step_success_rate": 0.6190476190476191,
+      "termination_reasons": {
+        "cbf_infeasible": 1094,
+        "success": 1172,
+        "road_departure": 3,
+        "collision": 12
+      }
+    },
+    "checkpoints": {
+      "best": {
+        "update_count": 27,
+        "training": {
+          "ego_initial_speed": 5.0,
+          "seed": 0,
+          "requested_timesteps": 150000,
+          "resume": null,
+          "global_step": 82944
+        }
+      },
+      "final": {
+        "update_count": 49,
+        "training": {
+          "ego_initial_speed": 5.0,
+          "seed": 0,
+          "requested_timesteps": 150000,
+          "resume": null,
+          "global_step": 150000
+        }
+      }
+    },
+    "best_evaluation": {
+      "episodes": 50,
+      "success_count": 33,
+      "success_rate": 0.66,
+      "mean_reward": 146.03549196875977,
+      "mean_merge_point_successful": 301.61351954159437,
+      "mean_r_merge_all_episodes": 0.8372078546434837,
+      "termination_reasons": {
+        "success": 33,
+        "cbf_infeasible": 16,
+        "collision": 1
+      }
+    },
+    "final_evaluation": {
+      "episodes": 50,
+      "success_count": 35,
+      "success_rate": 0.7,
+      "mean_reward": 152.1361257868181,
+      "mean_merge_point_successful": 304.8888088641999,
+      "mean_r_merge_all_episodes": 0.8468022787431138,
+      "termination_reasons": {
+        "success": 35,
+        "cbf_infeasible": 15
+      }
+    }
+  },
+  "10": {
+    "training": {
+      "global_steps": 150000,
+      "rows": 1998,
+      "completed_episodes": 1997,
+      "successful_episodes": 219,
+      "last_3000_step_success_rate": 0.0,
+      "termination_reasons": {
+        "cbf_infeasible": 663,
+        "road_departure": 8,
+        "success": 219,
+        "time_limit": 1079,
+        "collision": 28
+      }
+    },
+    "checkpoints": {
+      "best": {
+        "update_count": 10,
+        "training": {
+          "ego_initial_speed": 10.0,
+          "seed": 0,
+          "requested_timesteps": 150000,
+          "resume": null,
+          "global_step": 30720
+        }
+      },
+      "final": {
+        "update_count": 49,
+        "training": {
+          "ego_initial_speed": 10.0,
+          "seed": 0,
+          "requested_timesteps": 150000,
+          "resume": null,
+          "global_step": 150000
+        }
+      }
+    },
+    "best_evaluation": {
+      "episodes": 50,
+      "success_count": 16,
+      "success_rate": 0.32,
+      "mean_reward": 164.30523910512835,
+      "mean_merge_point_successful": 301.803932920654,
+      "mean_r_merge_all_episodes": 0.8491451030042954,
+      "termination_reasons": {
+        "time_limit": 24,
+        "success": 16,
+        "cbf_infeasible": 9,
+        "collision": 1
+      }
+    },
+    "final_evaluation": {
+      "episodes": 50,
+      "success_count": 1,
+      "success_rate": 0.02,
+      "mean_reward": 158.30823053609316,
+      "mean_merge_point_successful": 310.72660572153154,
+      "mean_r_merge_all_episodes": 0.8422120343856205,
+      "termination_reasons": {
+        "time_limit": 39,
+        "cbf_infeasible": 9,
+        "collision": 1,
+        "success": 1
+      }
+    }
+  }
+}

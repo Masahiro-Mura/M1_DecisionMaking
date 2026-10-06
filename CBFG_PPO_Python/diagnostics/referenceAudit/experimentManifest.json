@@ -1,0 +1,63 @@
+{
+  "speeds": [
+    5.0,
+    10.0
+  ],
+  "training_seeds": [
+    0
+  ],
+  "steps_per_run": 150000,
+  "optimization_epochs": 40,
+  "buffer_size": 3072,
+  "batch_size": 128,
+  "source_papers": {
+    "main": "C:\\Users\\mura\\OneDrive - keio.jp\\高橋研\\研究室\\M1_研究室\\論文サーベイ\\合流制御\\① Control Barrier Function-Guided Deep Reinforcement Learning for Decision-Making of Autonomous Vehicle at On-Ramp Merging.pdf",
+    "idm": "C:\\Users\\mura\\Downloads\\0002177v2 (1).pdf",
+    "ppo": "C:\\Users\\mura\\Downloads\\1707.06347v2 (1).pdf"
+  },
+  "runtime": {
+    "python": "3.13.5",
+    "torch": "2.13.0+cpu",
+    "numpy": "2.5.1",
+    "scipy": "1.18.0",
+    "CUDA_available": false,
+    "torch_threads": 1
+  },
+  "assumptions": {
+    "cbf_teacher": "one-step realized speed/heading, not inverse MPC",
+    "road_cbf": "connected physical outer boundaries",
+    "cbf_decay": "1-gamma, Eq20 over inconsistent Eq25 h0",
+    "test_speed_jitter_mps": 1.0,
+    "success_target_x_m": 450.0,
+    "success_stability_seconds": 2.0,
+    "success_lateral_tolerance_m": 1.0,
+    "checkpoint_selection": "fixed held-out success then return; paper average-return selection is not fully specified",
+    "policy_deterministic_action": "tanh of Gaussian mean, bounded policy convention",
+    "total_timesteps": "TableIII 150000; IV-A contains conflicting convergence counts",
+    "train_test_vehicle_count": [
+      6,
+      10
+    ],
+    "mpc_horizon": 10,
+    "mpc_Q_diagonal": [
+      1.0,
+      1.0
+    ],
+    "mpc_R_diagonal": [
+      0.1,
+      0.1
+    ]
+  },
+  "verified_tests_before_training": 35,
+  "evaluation_jitter_test_passed": true,
+  "scope": "User chose one seed per speed first; ten-seed statistics not claimed",
+  "paper_sha256": {
+    "main": "9514343e26c66194f0179c7eab7bf344d43109ea69b4ccdea3451f26baab2813",
+    "idm": "c866d7e02cc0381d8b8d669e5b7a14a416c6ac57853ec4e32101e2bf33b71e8b",
+    "ppo": "e78feadadbdbb0b601b3c2bcc81404722cd431a489b307545f9b7bea1e8c4f5b"
+  },
+  "verified_tests_final": 39,
+  "training_status": "150000 steps completed at both speeds; training figure exception repaired and regenerated from saved logs",
+  "evaluation_status": "best and final policies evaluated on 50 episodes each at both speeds",
+  "merge_point_definition": "first EV center entry into physical main-lane bounds y=2..6 on a main edge; successful episodes only for reported mean"
+}

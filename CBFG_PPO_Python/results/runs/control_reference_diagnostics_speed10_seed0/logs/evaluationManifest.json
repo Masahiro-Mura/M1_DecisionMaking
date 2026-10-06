@@ -1,0 +1,24 @@
+{
+  "model": "C:\\Users\\mura\\Simulation\\Research activities\\M1_DecisionMaking\\CBFG_PPO_Python\\results\\runs\\reference_v4_speed10_seed0\\models\\bestPolicy.pt",
+  "ego_initial_speed": 10.0,
+  "ego_minimum_speed": 10.0,
+  "episodes": 50,
+  "seed": 10000,
+  "test_speed_jitter": 1.0,
+  "test_speed_jitter_source": "Implementation assumption: amplitude unreported in IV-B",
+  "trained_policy_metadata": {
+    "ego_initial_speed": 10.0,
+    "ego_minimum_speed": 10.0,
+    "seed": 0,
+    "requested_timesteps": 150000,
+    "resume": null,
+    "global_step": 119808
+  },
+  "diagnostic_only": true,
+  "audited_diagnostic_source_updates": [
+    "cbf/safeController.py",
+    "environment/mergeEnvironment.py"
+  ],
+  "source_compatibility_required": false,
+  "deterministic_action": "tanh of Gaussian mean (bounded policy convention)"
+}

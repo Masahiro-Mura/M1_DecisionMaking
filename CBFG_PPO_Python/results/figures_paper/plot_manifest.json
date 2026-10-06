@@ -1,0 +1,102 @@
+{
+  "training_statistics": [
+    {
+      "speed": 5,
+      "method": "CBFG-PPO",
+      "seeds": [
+        0
+      ],
+      "run_mean_rewards": [
+        103.49949849620472
+      ],
+      "run_mean_raw_success_rates": [
+        0.42663447768106455
+      ],
+      "reward_mean": 103.49949849620472,
+      "reward_sd": null,
+      "success_rate_mean": 0.42663447768106455,
+      "success_rate_sd": null
+    },
+    {
+      "speed": 10,
+      "method": "CBFG-PPO",
+      "seeds": [
+        0
+      ],
+      "run_mean_rewards": [
+        84.04675607460881
+      ],
+      "run_mean_raw_success_rates": [
+        0.29720437055734467
+      ],
+      "reward_mean": 84.04675607460881,
+      "reward_sd": null,
+      "success_rate_mean": 0.29720437055734467,
+      "success_rate_sd": null
+    }
+  ],
+  "traces": [
+    {
+      "file": "fig8_cbfg_ppo_speed5_seed0",
+      "method": "CBFG-PPO",
+      "speed": 5,
+      "seed": 0,
+      "sv_count": 6,
+      "start_time": 0.2,
+      "end_time": 18.400000000000002
+    },
+    {
+      "file": "fig8_cbfg_ppo_speed10_seed0",
+      "method": "CBFG-PPO",
+      "speed": 10,
+      "seed": 0,
+      "sv_count": 6,
+      "start_time": 0.2,
+      "end_time": 14.8
+    }
+  ],
+  "sources": [
+    {
+      "path": "C:\\Users\\mura\\Simulation\\Research activities\\M1_DecisionMaking\\CBFG_PPO_Python\\results\\runs\\reference_v4_speed5_seed0\\logs\\trainingLog.csv",
+      "sha256": "bc6ba2b57a494667fb0421c4584664b30157c911263dc7c7ae6a0ae376d3343c"
+    },
+    {
+      "path": "C:\\Users\\mura\\Simulation\\Research activities\\M1_DecisionMaking\\CBFG_PPO_Python\\results\\runs\\reference_v4_speed5_seed0\\logs\\simulationLog.csv",
+      "sha256": "3b9e8f33cf1e84d25f6cd2bc48fea9d8a8c096a77448393e935c54b5c008cd21"
+    },
+    {
+      "path": "C:\\Users\\mura\\Simulation\\Research activities\\M1_DecisionMaking\\CBFG_PPO_Python\\results\\runs\\reference_v4_speed5_seed0\\logs\\evaluationLog.csv",
+      "sha256": "784dfcb5de4c1d1d9d73e9d1eddea504d87b32735134aa4545bdd8f7e770314c"
+    },
+    {
+      "path": "C:\\Users\\mura\\Simulation\\Research activities\\M1_DecisionMaking\\CBFG_PPO_Python\\results\\runs\\reference_v4_speed5_seed0\\logs\\evaluationManifest.json",
+      "sha256": "ca5128e0cb9ffc27631c40eae6ddb580a79f932c405e0b5840c54229a43bbf53"
+    },
+    {
+      "path": "C:\\Users\\mura\\Simulation\\Research activities\\M1_DecisionMaking\\CBFG_PPO_Python\\results\\runs\\reference_v4_speed10_seed0\\logs\\trainingLog.csv",
+      "sha256": "ee4b11bef773a8b1c9f559fa14208651a6eb6fc8ab54fde4880182037aa513a8"
+    },
+    {
+      "path": "C:\\Users\\mura\\Simulation\\Research activities\\M1_DecisionMaking\\CBFG_PPO_Python\\results\\runs\\reference_v4_speed10_seed0\\logs\\simulationLog.csv",
+      "sha256": "4fb2bcc35cac10a698b88c0aaa17b96e47f9d76cad79f61124251b6d9808d3c1"
+    },
+    {
+      "path": "C:\\Users\\mura\\Simulation\\Research activities\\M1_DecisionMaking\\CBFG_PPO_Python\\results\\runs\\reference_v4_speed10_seed0\\logs\\evaluationLog.csv",
+      "sha256": "7c57fcf32a8ab05246e7c198c8f0fc366dd946d6b1338c9cd6f8412fbe1782c3"
+    },
+    {
+      "path": "C:\\Users\\mura\\Simulation\\Research activities\\M1_DecisionMaking\\CBFG_PPO_Python\\results\\runs\\reference_v4_speed10_seed0\\logs\\evaluationManifest.json",
+      "sha256": "03677557fd768e3c66d5fe99eea385f385e8d8302988f5b30e350c78305c33b5"
+    }
+  ],
+  "conventions": {
+    "success_window_steps": 3000,
+    "success_smoothing_samples": 10,
+    "reward_smoothing": "trailing width 10, plotting assumption; bars use raw returns",
+    "curve_alignment": "linear interpolation on common observed support",
+    "bar_mean": "equal-weight mean of run means, completed episode endpoints",
+    "bar_success": "raw 3000-step rates, before display smoothing",
+    "standard_deviation_ddof": 0,
+    "single_seed_sd": null
+  }
+}

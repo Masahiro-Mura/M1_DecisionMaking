@@ -1,0 +1,46 @@
+{
+  "version": "cbfg-ppo-minimum-speed-v4",
+  "training_seeds": [
+    0
+  ],
+  "speeds_mps": [
+    5,
+    10
+  ],
+  "steps_per_speed": 150000,
+  "validation_tests_passed": 55,
+  "evaluation_episodes_per_model": 50,
+  "evaluation_seed_start": 10000,
+  "test_speed_jitter_mps": 1.0,
+  "teacher_assumption": "Original physical reference + one-step safe-minus-nominal speed/heading effect, then normalize and clip; not inverse MPC.",
+  "weight_assumption": "Main Eq28 exponential norm of normalized rollout teacher - original normalized action.",
+  "intervention_threshold_assumption": "Existing 1e-3 physical-control correction norm; not provided by main or cited papers.",
+  "source_papers": {
+    "37": {
+      "path": "C:\\Users\\mura\\Downloads\\07593c39a72088663c03dafeef7865743d8a (1).pdf",
+      "sha256": "9018624cfdce8b2eb74c4705d549294530e3a71ae23c449c1b520c7125002632"
+    },
+    "43": {
+      "path": "C:\\Users\\mura\\Downloads\\1707.08817v2 (1).pdf",
+      "sha256": "ad3777fc7a4900b5548ca05998563b07d5ab43bc1aa4f0939a4ca89962df1ef2"
+    },
+    "44": {
+      "path": "C:\\Users\\mura\\Downloads\\1709.10087v2 (1).pdf",
+      "sha256": "555e6470f7c4249a2f0c6a0f19f995a12060386d686f0125d4e72862f767d7c5"
+    }
+  },
+  "minimum_speed_cases_mps": [
+    5,
+    10
+  ],
+  "episode_durations_seconds": [
+    40,
+    20
+  ],
+  "minimum_speed_source": "Main Paper III-D PDF p9: maintained minimum, not initial speed alone",
+  "minimum_speed_enforcement": "reference lower bound + linear predicted MPC-speed constraints + CBF acceleration lower bound; no post-step speed clipping",
+  "scope_correction": "v3 partial studies interrupted after discovering omitted minimum-speed condition; final study is v4",
+  "baseline_limitation": "v2 had only initial speed, so the complete v2-v4 comparison includes a traffic-condition correction as well as teacher/weight changes",
+  "training_status": "both speeds completed 150000 steps",
+  "evaluation_status": "best and final models, 50 episodes each at both speeds"
+}
